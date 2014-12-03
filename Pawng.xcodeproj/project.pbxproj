@@ -405,6 +405,7 @@
 				B721ED0B1A228D2000FD1756 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		B721ED0C1A228D2000FD1756 /* Build configuration list for PBXNativeTarget "PawngTests" */ = {
 			isa = XCConfigurationList;
@@ -413,6 +414,7 @@
 				B721ED0E1A228D2000FD1756 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
