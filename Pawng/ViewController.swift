@@ -25,11 +25,28 @@ class ViewController: UIViewController, UICollisionBehaviorDelegate, UIGestureRe
     var maxY : CGFloat!
     
     var square : UIView!
-    var userPaddle : UIView!
+    var UserPaddle : UIView!
     var AIPaddle : UIView!
     
     @IBOutlet var panRecognizer: UIPanGestureRecognizer!
     
+    @IBOutlet weak var UserScore: UILabel!
+    @IBOutlet weak var AIScoreLabel: UILabel!
+    
+//    @IBOutlet weak var UserPaddle: UIView?
+    
+//    @IBOutlet weak var UserPaddleYConstraint: NSLayoutConstraint!
+    
+    override func loadView() {
+        
+        super.loadView()
+        UserPaddle = UIView()
+        
+        
+        
+        view.addSubview(UserPaddle!)
+        
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -52,12 +69,9 @@ class ViewController: UIViewController, UICollisionBehaviorDelegate, UIGestureRe
         square.backgroundColor = UIColor.grayColor()
         view.addSubview(square)
         
-//        userPaddle = UIView(frame: CGRect(x: 30, y: maxY/2-50, width: 10, height: 100))
-        userPaddle = UIView()
-        userPaddle.frame = CGRect(x: 30, y: maxY/2-50, width: 10, height: 100)
+//        UserPaddle = UIView(frame: CGRect(x: 30, y: maxY/2-50, width: 10, height: 100))
+        
 
-        userPaddle.backgroundColor = UIColor.blueColor()
-        view.addSubview(userPaddle)
         
         AIPaddle = UIView(frame: CGRect(x: maxX-30, y: maxY/2-50, width: 10, height: 100))
         AIPaddle.backgroundColor = UIColor.redColor()
@@ -77,11 +91,7 @@ class ViewController: UIViewController, UICollisionBehaviorDelegate, UIGestureRe
         ballProperties.friction = 0.0
         ballProperties.resistance = 0.0
         
-        paddleProperties = UIDynamicItemBehavior(items: [userPaddle,AIPaddle])
-        paddleProperties.allowsRotation = false
-        paddleProperties!.density = 1000.0
         
-        animator.addBehavior(paddleProperties)
 
         
         
@@ -98,24 +108,7 @@ class ViewController: UIViewController, UICollisionBehaviorDelegate, UIGestureRe
         animator.addBehavior(pusher)
         
         
-        collision = UICollisionBehavior(items: [square,userPaddle,AIPaddle])
-        collision.translatesReferenceBoundsIntoBoundary = true
-        animator.addBehavior(collision)
         
-        
-        collision.action = {
-//            println("Hey collisions")
-//            println("\(NSStringFromCGAffineTransform(square.transform)) \(NSStringFromCGPoint(square.center))")
-            
-            if(self.square.frame.minX <= 10 || self.square.frame.maxX >= self.maxX-10){
-//                println("\(self.square.center)")
-
-            }
-            
-            
-        }
-        
-        collision.collisionDelegate = self
         
 
     }
@@ -123,6 +116,36 @@ class ViewController: UIViewController, UICollisionBehaviorDelegate, UIGestureRe
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
         
+        if (UserPaddle.frame.size.width == 0){
+            UserPaddle.frame = CGRect(x: 30, y: maxY/2-50, width: 10, height: 100)
+            UserPaddle!.backgroundColor = UIColor.blueColor()
+        }
+
+        
+        paddleProperties = UIDynamicItemBehavior(items: [UserPaddle,AIPaddle])
+        paddleProperties.allowsRotation = false
+        paddleProperties!.density = 9999.0
+        
+        animator.addBehavior(paddleProperties)
+        
+        collision = UICollisionBehavior(items: [square,UserPaddle,AIPaddle])
+        collision.translatesReferenceBoundsIntoBoundary = true
+        animator.addBehavior(collision)
+        
+        
+        collision.action = {
+            //            println("Hey collisions")
+            //            println("\(NSStringFromCGAffineTransform(square.transform)) \(NSStringFromCGPoint(square.center))")
+            
+            if(self.square.frame.minX <= 10 || self.square.frame.maxX >= self.maxX-10){
+                //                println("\(self.square.center)")
+                
+            }
+            
+            
+        }
+        
+        collision.collisionDelegate = self
     }
     
     func collisionBehavior(behavior: UICollisionBehavior, beganContactForItem item1: UIDynamicItem, withItem item2: UIDynamicItem, atPoint p: CGPoint) {
@@ -134,15 +157,32 @@ class ViewController: UIViewController, UICollisionBehaviorDelegate, UIGestureRe
     
     @IBAction func didPanOnView(sender: UIPanGestureRecognizer) {
         
-        var offset : CGPoint = sender.translationInView(self.view)
-        var originPoint : CGPoint = userPaddle.frame.origin
-        var newPoint : CGPoint = CGPointMake(userPaddle.frame.origin.x, originPoint.y + offset.y)
+//        var offset : CGPoint = sender.translationInView(self.view)
+//        self.UserPaddleYConstraint.constant += offset.y
+//        println("y constraint constant \(self.UserPaddleYConstraint.constant)")
+//        self.view.layoutIfNeeded()
         
-        var potentialNewFrame : CGRect = CGRectMake(newPoint.x, newPoint.y, CGRectGetWidth(userPaddle.frame), CGRectGetHeight(userPaddle.frame))
+//        var constraints : [NSLayoutConstraint] = UserPaddle.constraints() as [NSLayoutConstraint]
+//        
+//        for constraint : NSLayoutConstraint in constraints{
+//            
+//            if (constraint.firstAttribute == NSLayoutAttribute.CenterY){
+//                println("hello")
+//            }
+//        }
+        
+        
+        
+        var offset : CGPoint = sender.translationInView(self.view)
+        var originPoint : CGPoint = UserPaddle!.frame.origin
+        var newPoint : CGPoint = CGPointMake(UserPaddle!.frame.origin.x, originPoint.y + offset.y)
+        
+        var potentialNewFrame : CGRect = CGRectMake(20, newPoint.y, CGRectGetWidth(UserPaddle!.frame), CGRectGetHeight(UserPaddle!.frame))
         
         if (CGRectContainsRect(self.view.frame, potentialNewFrame)) {
             
-            self.userPaddle.frame = potentialNewFrame;
+            self.UserPaddle!.frame = potentialNewFrame;
+            println( "new point y \(newPoint.y)")
         
         }
         
@@ -152,19 +192,14 @@ class ViewController: UIViewController, UICollisionBehaviorDelegate, UIGestureRe
 //        var frameOrigin : CGFloat = frame.origin.y + velocity.y
 ////        frameOrigin = min(frameOrigin, self.viewFrame.size.height - frame.size.height)
 ////        frameOrigin = max(frameOrigin, 0)
-//        
+//
 ////        self.userPaddle.center = velocity
 //        self.userPaddle.center = CGPointMake(self.userPaddle.center.x, self.userPaddle.center.y + velocity.y)
 ////            self.userPaddle.frame = CGRectMake(frame.origin.x, frame.origin.y + velocity.y, frame.size.width, frame.size.height)
 //        println("\(self.userPaddle.center.x) \(self.userPaddle.center.y + velocity.y)")
 //        sender.setTranslation(CGPointMake(0, 0), inView: self.view)
     }
-    @IBAction func didPan(sender: AnyObject) {
-        
-        println("hello")
-    }
-    
-    
+
 
     
     
